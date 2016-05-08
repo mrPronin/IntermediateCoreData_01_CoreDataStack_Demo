@@ -24,7 +24,7 @@ import UIKit
 import CoreData
 
 class DevicesTableViewController: UITableViewController {
-  var managedObjectContext: NSManagedObjectContext!
+  var coreDataStack: CoreDataStack!
   var devices = [Device]()
 
   var selectedPerson: Person?
@@ -37,8 +37,8 @@ class DevicesTableViewController: UITableViewController {
     } else {
       title = "Devices"
       navigationItem.rightBarButtonItems = [
-      UIBarButtonItem(barButtonSystemItem: .Add, target: self, action: "addDevice:"),
-      UIBarButtonItem(title: "Filter", style: .Plain, target: self, action: "selectFilter:")
+      UIBarButtonItem(barButtonSystemItem: .Add, target: self, action: #selector(DevicesTableViewController.addDevice(_:))),
+      UIBarButtonItem(title: "Filter", style: .Plain, target: self, action: #selector(DevicesTableViewController.selectFilter(_:)))
       ]
     }
   }
@@ -64,7 +64,7 @@ class DevicesTableViewController: UITableViewController {
       ]
 
       do {
-        if let results = try managedObjectContext.executeFetchRequest(fetchRequest) as? [Device] {
+        if let results = try coreDataStack.managedObjectContext.executeFetchRequest(fetchRequest) as? [Device] {
           devices = results
         }
       } catch {
@@ -137,7 +137,7 @@ class DevicesTableViewController: UITableViewController {
 
   override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
     if let dest = segue.destinationViewController as? DeviceDetailTableViewController {
-      dest.managedObjectContext = managedObjectContext
+      dest.coreDataStack = coreDataStack
 
       if let selectedIndexPath = tableView.indexPathForSelectedRow {
         let device = devices[selectedIndexPath.row]
